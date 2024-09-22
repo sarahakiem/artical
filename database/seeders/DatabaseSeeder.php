@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\Topic;
 use App\Models\Category;
 use App\Models\Testimonial;
-use App\Models\Message;
+use App\Models\Contact;
 
 
 
@@ -21,19 +21,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-       //Category::factory(7)->create();
-        Topic::factory(30)->create();
-        Testimonial::factory(7)->create();
-        Message::factory(30)->create();
-
-
-
-
-        // User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        User::factory(10)->create();
+        Category::factory(7)->create();
+        Topic::factory(60)->create();
+        Testimonial::factory(9)->create();
+        Contact::factory(20)->create();
     }
 }

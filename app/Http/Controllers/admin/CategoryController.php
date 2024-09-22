@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Traits\Common;
@@ -15,7 +16,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::get();
-        return view('admin.categories', compact('categories'));
+        return view('admin.pages.categories', compact('categories'));
     }
 
     /**
@@ -24,7 +25,7 @@ class CategoryController extends Controller
     public function create()
     {
 
-        return view('admin.add_category');
+        return view('admin.pages.add_category');
     }
 
     /**
@@ -34,13 +35,13 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'category_name' => 'required|string',
+            'published' => 'boolean',
 
         ]);
-
+        $data['published'] = $data['published'] ?? false;
         Category::create($data);
 
-        //return redirect()->route('categories.index');
-        return('data inserted sucessfuly');
+        return redirect()->route('categories.index');
 
     }
 
@@ -58,7 +59,7 @@ class CategoryController extends Controller
     public function edit(string $id)
     {
         $category = Category::findOrfail($id);
-        return view('admin.edit_category', compact('category'));
+        return view('admin.pages.edit_category', compact('category'));
     }
 
     /**
@@ -68,9 +69,10 @@ class CategoryController extends Controller
     {
         $data = $request->validate([
             'category_name' => 'required|string',
+            'published' => 'boolean',
 
         ]);
-        
+
         Category::where('id', $id)->update($data);
         return redirect()->route('categories.index');
 

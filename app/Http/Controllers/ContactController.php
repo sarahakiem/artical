@@ -2,35 +2,24 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Mail\contactMail;
+use App\Models\Contact;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
-use App\Models\Message;
-
 
 class ContactController extends Controller
 {
-    public function contactMail(){
-        return view('public.contact');
-    }
-    public function sendEmail(Request $request){
-      $data= $request->except('_token');
-      Mail::to('saraamer@gmail.com')->send(new contactMail($data));
-      return "massege send succesfuly";
+    public function contactMail()
+    {
+        return view('public.pages.contact');
     }
 
-    //view to blade to add message
-    public function createMessage(){
-        return view('admin.add_contactMessage');
-    }
+    //store messages from contact form to mailtrap to and database
 
-
-    //store messages from contact form recieved to mailtrap to database using admin blade with a form
-    
     public function store(Request $request)
     {
-        
-        $data= $request->validate([
+
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'message' => 'required|string',
             'subject' => 'required|string|max:255',
@@ -38,35 +27,42 @@ class ContactController extends Controller
             'read' => 'boolean',
         ]);
 
-        Message::create($data);
+        Contact::create($data);
+        //send to mailtrap
+        Mail::to('saraamer@gmail.com')->send(new contactMail($data));
 
-        // Redirect or provide feedback
-        return redirect()->back()->with('success', 'Your message has been sent successfully!');
+        return redirect()->back();
     }
 
-    public function index(){
+    public function index()
+    {
 
-        $unreadMessages = Message::where('read', false)->get();
-        $readMessages = Message::where('read', true)->get();
+        $unreadMessages = Contact::where('read', false)->get();
+        $readMessages = Contact::where('read', true)->get();
 
-        return view('admin.messages', compact('unreadMessages', 'readMessages'));
+        return view('admin.pages.messages', compact('unreadMessages', 'readMessages'));
     }
     public function show($id)
     {
-        $message = Message::findOrFail($id);
+        $message = Contact::findOrFail($id);
 
-        if ($message) {
-            $message->update(['is_read' => true]); 
-        }
-
-        return view('admin.message_details', compact('message'));
+        return view('admin.pages.message_details', compact('message'));
     }
 
     public function destroy($id)
     {
-        $message = Message::findOrFail($id);
+        $message = Contact::findOrFail($id);
         $message->delete();
 
-        return redirect()->back()->with('success', 'Message deleted successfully.');
+        return redirect()->back();
     }
+    //mark as read
+    public function markAsRead($id)
+    {
+        $message = Contact::findOrFail($id);
+        $message->update(['read' => 1]);
+
+        return redirect()->back();
+    }
+
 }

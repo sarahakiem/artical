@@ -17,8 +17,9 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained('categories');
             $table->text('content');
             $table->boolean('trending');
-            $table->boolean('published');
+            $table->boolean('published')->default(0);
             $table->string('image');
+            $table->unsignedBigInteger('views')->default(0);
             $table->timestamps();
 
 

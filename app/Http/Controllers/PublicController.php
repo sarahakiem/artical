@@ -3,27 +3,30 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Topic;
 use App\Models\Testimonial;
-use Illuminate\Http\Request;
+use App\Models\Topic;
 
 class PublicController extends Controller
 {
-    // Helper method to fetch categories with topics
     private function getCategoriesWithTopics($limit)
     {
-        return Category::with(['topics' => function ($query) {
-            $query->latest()->take(3);
-        }])->latest()->limit($limit)->get();
+        return Category::where('published', 1)
+            ->whereHas('topics', function ($query) {
+                $query->where('published', 1);
+            })
+            ->with(['topics' => function ($query) {
+                $query->where('published', 1)->latest()->take(3);
+            }])
+            ->latest()
+            ->limit($limit)
+            ->get();
     }
 
-    // Helper method to fetch published topics
     private function getPublishedTopics()
     {
         return Topic::where('published', 1)->get();
     }
 
-    // Helper method to fetch published testimonials
     private function getPublishedTestimonials()
     {
         return Testimonial::where('published', 1)->get();
@@ -32,49 +35,72 @@ class PublicController extends Controller
     // Show all categories
     public function showAllcategory()
     {
-        $categories = $this->getCategoriesWithTopics(2);
-        $topics = $this->getPublishedTopics();
+        $categories = $this->getCategoriesWithTopics(3);
+        $topics = $this->getPublishedTopics(3);
 
-        return view('includes.index_brwosesSec', compact('categories', 'topics'));
+        return view('public.includes.index_brwosesSec', compact('categories', 'topics'));
     }
 
     // Show home page
     public function index()
     {
         $categories = $this->getCategoriesWithTopics(3);
-        $topics = $this->getPublishedTopics();
-        $testimonial = $this->getPublishedTestimonials();
+        $topics = $this->getPublishedTopics(3);
+        $testimonial = $this->getPublishedTestimonials(3);
+        $popularTopics = Topic::where('published', 1)->whereHas('category', function ($query) {
+            $query->where('published', 1);
+            $query->whereHas('topics', function ($subQuery) {
+                $subQuery->where('published', 1);
+            });
+        })->orderBy('views', 'desc')->take(1)->get();
+        $popularTopics2 = Topic::where('published', 1)->whereHas('category', function ($query) {
+            $query->where('published', 1);
+            $query->whereHas('topics', function ($subQuery) {
+                $subQuery->where('published', 1);
+            });
+        })->orderBy('views', 'desc')->skip(1)->take(1)->get();
 
-        return view('public.index', compact('categories', 'topics', 'testimonial'));
+        return view('public.pages.index', compact('categories', 'topics', 'testimonial', 'popularTopics', 'popularTopics2'));
     }
 
     // Show all topics list
     public function ShowAlltopic()
     {
         $topics = Topic::where('published', 1)->paginate(4);
+        $trendingTopics = Topic::where('published', 1)->where('trending', 1)->latest()->take(2)->get();
 
-        return view('public.topics-listing', compact('topics'));
+        return view('public.pages.topics-listing', compact('topics', 'trendingTopics'));
     }
 
-    // Show testimonials
+    // send varibles to public view
     public function testimonial()
     {
         $testimonial = $this->getPublishedTestimonials();
 
-        return view('public.testimonials', compact('testimonial'));
+        return view('public.pages.testimonials', compact('testimonial'));
     }
 
-    // Show testimonials (different view)
+    // Show testimonials ( include view)
     public function showTestimonial()
     {
         $testimonial = $this->getPublishedTestimonials();
 
-        return view('includes.testimonial', compact('testimonial'));
+        return view('public.includes.testimonial', compact('testimonial'));
     }
 
     public function showDetails(string $id)
     {
-        $topic = Topic::with('category')->findOrFail($id);
-        return view('public.topics-detail', compact('topic'));
+        $topic = Topic::with('category')->where('published', 1)->findOrFail($id);
+        return view('public.pages.topics-detail', compact('topic'));
     }
+
+    // increase number of views when press in bookmark in topic details
+    public function bookmark($id)
+    {
+        $topic = Topic::findOrFail($id);
+        $topic->increment('views');
+
+        return redirect()->back();
+    }
+
 }

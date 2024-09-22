@@ -1,21 +1,21 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Testimonial;
 use App\Traits\Common;
-
+use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
-{ use Common;
+{use Common;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $testimonials=Testimonial::get();
-        return view('admin.testimonials',compact('testimonials'));
+        $testimonials = Testimonial::get();
+        return view('admin.pages.testimonials', compact('testimonials'));
     }
 
     /**
@@ -23,7 +23,7 @@ class TestimonialController extends Controller
      */
     public function create()
     {
-        return view('admin.add_testimonial');
+        return view('admin.pages.add_testimonial');
     }
 
     /**
@@ -35,12 +35,15 @@ class TestimonialController extends Controller
             'name' => 'required|string',
             'content' => 'required|string',
             'published' => 'boolean',
-            'image' => 'required|mimes:png,jpg,jpeg',
+            'image' => 'required|mimes:png,jpg,jpeg|max:5120',
         ]);
+        $data['published'] = isset($data['published']) ? (bool) $data['published'] : false;
         if ($request->hasFile('image')) {
-            $data['image'] = $this->uploadFile($request->image,'assets/images/testimonials');
+            //dd($request->image);
+            $data['image'] = $this->uploadFile($request->image, 'assets/images/testimonials');
         }
         Testimonial::create($data);
+
         return redirect()->route('testimonial.index');
     }
 
@@ -50,7 +53,7 @@ class TestimonialController extends Controller
     public function show(string $id)
     {
         $testimonial = Testimonial::findOrFail($id);
-        return view('admin.testimonial_details', compact('testimonial'));
+        return view('admin.pages.testimonial_details', compact('testimonial'));
     }
 
     /**
@@ -59,7 +62,7 @@ class TestimonialController extends Controller
     public function edit(string $id)
     {
         $testimonial = Testimonial::findOrFail($id);
-        return view('admin.edit_testimonial', compact('testimonial'));
+        return view('admin.pages.edit_testimonial', compact('testimonial'));
     }
 
     /**
@@ -71,10 +74,10 @@ class TestimonialController extends Controller
             'name' => 'required|string',
             'content' => 'required|string',
             'published' => 'boolean',
-            'image' => 'sometimes|mimes:png,jpg,jpeg',
+            'image' => 'sometimes|mimes:png,jpg,jpeg|max:5120',
         ]);
         if ($request->hasFile('image')) {
-            $data['image'] = $this->uploadFile($request->image,'assets/images/testimonials');
+            $data['image'] = $this->uploadFile($request->image, 'assets/images/testimonials');
         }
         Testimonial::where('id', $id)->update($data);
         return redirect()->route('testimonial.index');
@@ -88,5 +91,4 @@ class TestimonialController extends Controller
         $id = $request->id;
         Testimonial::where('id', $id)->delete($id);
         return redirect()->route('testimonial.index');
-    }
-}
+    }}
