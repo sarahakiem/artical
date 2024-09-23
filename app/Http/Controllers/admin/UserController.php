@@ -1,13 +1,12 @@
 <?php
 namespace App\Http\Controllers\Admin;
-
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-
 class UserController extends Controller
 {
+    
     /**
      * Display a listing of the resource.
      */
@@ -38,10 +37,11 @@ class UserController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'active' => ['boolean'],
-
         ]);
+       $data['email_verified_at'] = now();
+       //dd($data);
         User::create($data);
-
+      
         return redirect()->route('user.index');
 
     }

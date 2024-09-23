@@ -42,7 +42,7 @@ Route::group(['prefix' => 'public'], function () {
 });
 
 Route::group(
-    ['middleware' => ['verified', CheckActiveUser::class],
+    ['middleware' => ['auth','verified', CheckActiveUser::class],
     ],
     function () {
 
