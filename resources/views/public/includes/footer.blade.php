@@ -79,3 +79,9 @@
     <script src="{{asset('assets/js/jquery.sticky.js')}}"></script>
     <script src="{{asset('assets/js/click-scroll.js')}}"></script>
     <script src="{{asset('assets/js/custom.js')}}"></script>
+    <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                var successModal = new bootstrap.Modal(document.getElementById('successModal'));
+                                successModal.show();
+                            });
+                        </script>

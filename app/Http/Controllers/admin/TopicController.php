@@ -40,6 +40,7 @@ class TopicController extends Controller
             'image' => 'required|mimes:png,jpg,jpeg|max:2048',
 
         ]);
+        $data['trending'] = $data['trending'] ?? false;
         $data['published'] = $data['published'] ?? false;
         if ($request->hasFile('image')) {
             $data['image'] = $this->uploadFile($request->image, 'assets/images/topics');

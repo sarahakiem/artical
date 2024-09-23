@@ -13,8 +13,13 @@
                             {{ session('status') }}
                         </div>
                     @endif
-
+                    @if (auth()->user()->hasVerifiedEmail())
                     {{ __('You are logged in!') }}
+                    @else
+                        <div class="alert alert-warning" role="alert">
+                            {{ __('Please verify your email to access the dashboard.') }}
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

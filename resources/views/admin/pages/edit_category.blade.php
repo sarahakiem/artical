@@ -21,7 +21,7 @@
                 <label for="published" class="form-label col-md-2 fw-bold text-md-end">Published:</label>
                 <div class="col-md-10">
                     <input type="hidden" name="published" value="0" />
-                    <input type="checkbox" id="published" class="form-check-input" name="published" @checked(old('published', $topic->published)) value="1" />
+                    <input type="checkbox" id="published" class="form-check-input" name="published" @checked(old('published', $category->published)) value="1" />
                     @error('published')
                         <div class="alert alert-danger">{{ $message }}</div>
                     @enderror

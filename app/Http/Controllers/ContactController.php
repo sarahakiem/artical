@@ -31,7 +31,7 @@ class ContactController extends Controller
         //send to mailtrap
         Mail::to('saraamer@gmail.com')->send(new contactMail($data));
 
-        return redirect()->back();
+        return redirect()->back()->with('success', 'Thank you for contacting us! Your message has been successfully sent, we will get back to you shortly.');
     }
 
     public function index()
